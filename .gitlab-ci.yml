@@ -1,0 +1,11 @@
+image: "rust:latest"
+
+pages:
+  script:
+    - cargo doc --no-deps
+    - cp -r ./target/doc ./public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
