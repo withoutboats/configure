@@ -4,16 +4,19 @@
 //! envionmental configuration into your project. By deriving the
 //! `Configure` trait for your configuration, you can get an automatic
 //! system for managing your configuration at runtime.
-#![deny(missing_docs)]
+//#![deny(missing_docs)]
 #[macro_use] extern crate serde;
-
-extern crate failure;
+extern crate erased_serde;
+extern crate heck;
 extern crate toml;
 
-pub mod source;
-mod value;
+#[cfg(test)]
+#[macro_use] extern crate serde_derive;
 
-use failure::Error;
+pub mod source;
+mod default;
+
+use erased_serde::Error;
 
 /// A configuration struct which can be generated from the environment.
 ///
