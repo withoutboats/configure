@@ -48,6 +48,26 @@ impl ActiveConfiguration {
     /// If you set the active configuration, you should do so very early in
     /// your program, preferably as close to the beginning of main as possible.
     /// That way, the configuration source is consistent for every dependency.
+    ///
+    /// For example, if you wanted to store each dependency's config in a JSON
+    /// separate file per dependency:
+    ///
+    /// ```rust,ignore
+    /// use std::fs::File;
+    /// use std::env;
+    /// use std::path::PathBuf;
+    ///
+    /// use configure::source::CONFIGURATION;
+    /// use serde_json::Deserializer;
+    ///
+    /// fn main() {
+    ///     let dir: PathBuf = env::var_os("CARGO_MANIFEST_DIR").unwrap().into();
+    ///     CONFIGURATION.set(move |package| {
+    ///         let file = File::open(dir.join(format!("{}.json", package)));
+    ///         Deserializer::new(file)
+    ///     }
+    /// }
+    /// ```
     pub fn set<F, D>(&'static self, initializer: F)
     where
         F: Fn(&'static str) -> D + Send + Sync + 'static,
