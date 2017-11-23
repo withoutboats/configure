@@ -15,6 +15,13 @@ use toml;
 
 use self::env_deserializer::EnvDeserializer;
 
+/// The default source for configuration values. If you do not set the source
+/// of configuration manually, this is the source that will be used.
+///
+/// No constructor is provided, and there is no way to access this value
+/// except through the `CONFIGURATION` global static. This is included in
+/// documentation only to aid in understanding how the configuration source
+/// system works.
 #[derive(Clone)]
 pub struct DefaultSource {
     toml: Option<Arc<toml::Value>>,
@@ -59,6 +66,8 @@ impl DefaultSource {
                 .map(|metadata| metadata.clone())
     }
 
+    /// Prepare a deserializer to be used for the configuration for this given
+    /// package.
     pub fn prepare(&self, package: &'static str) -> Box<DynamicDeserializer<'static>> {
         let deserializer = DefaultDeserializer {
             source: self.clone(),
