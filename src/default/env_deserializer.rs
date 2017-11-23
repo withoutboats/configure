@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 
-use serde::de::*;
-use serde::de::{Error as ErrorTrait};
+use serde::de::*; use serde::de::{Error as ErrorTrait};
 use erased_serde::Error;
 
 pub struct EnvDeserializer<'a>(pub Cow<'a, str>);
@@ -340,5 +339,17 @@ mod tests {
     fn test_strings() {
         assert_eq!(String::deserialize(deserializer("Hello world!")).unwrap(),
                    String::from("Hello world!"))
+    }
+
+    #[test]
+    fn test_booleans() {
+        assert_eq!(bool::deserialize(deserializer("0")).unwrap(), false);
+        assert_eq!(bool::deserialize(deserializer("1")).unwrap(), true);
+        assert_eq!(bool::deserialize(deserializer("false")).unwrap(), false);
+        assert_eq!(bool::deserialize(deserializer("true")).unwrap(), true);
+        assert_eq!(bool::deserialize(deserializer("False")).unwrap(), false);
+        assert_eq!(bool::deserialize(deserializer("True")).unwrap(), true);
+        assert_eq!(bool::deserialize(deserializer("FALSE")).unwrap(), false);
+        assert_eq!(bool::deserialize(deserializer("TRUE")).unwrap(), true);
     }
 }

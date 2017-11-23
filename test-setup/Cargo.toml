@@ -1,0 +1,20 @@
+[package]
+authors = ["Without Boats <woboats@gmail.com>"]
+name = "test-setup"
+version = "0.1.0"
+
+[dependencies]
+erased-serde = "0.3.3"
+serde = "1.0.21"
+
+[dependencies.configure]
+path = "../"
+
+[lib]
+path = "./lib.rs"
+
+[package.metadata.test]
+first_field = 9
+second_field = "Colonel Aureliano Buendia"
+third_field = [10, 20, 30]
+
