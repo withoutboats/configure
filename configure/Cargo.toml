@@ -1,7 +1,7 @@
 [package]
 authors = ["Without Boats <woboats@gmail.com>"]
 name = "configure"
-version = "0.1.0"
+version = "0.0.1"
 
 [dependencies]
 erased-serde = "0.3.3"
@@ -14,8 +14,4 @@ serde_derive = "1.0.21"
 
 [dev-dependencies.test-setup]
 path = "./test-setup"
-
-[dev-dependencies.configure_derive]
-path = "./configure_derive"
-
-[workspace]
+version = "0.1.0"
