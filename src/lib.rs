@@ -16,7 +16,7 @@ extern crate toml;
 pub mod source;
 mod default;
 
-use erased_serde::Error;
+pub use erased_serde::Error as DeserializeError;
 
 /// A configuration struct which can be generated from the environment.
 ///
@@ -36,7 +36,11 @@ use erased_serde::Error;
 /// ```
 pub trait Configure: Default {
     /// Generate this configuration from the ambient environment.
-    fn generate() -> Result<Self, Error>;
+    fn generate() -> Result<Self, DeserializeError>;
+
     /// Regenerate this configuration.
-    fn regenerate(&mut self) -> Result<(), Error>;
+    fn regenerate(&mut self) -> Result<(), DeserializeError> {
+        *self = Self::generate()?;
+        Ok(())
+    }
 }
