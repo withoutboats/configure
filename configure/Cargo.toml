@@ -1,6 +1,8 @@
 [package]
-authors = ["Without Boats <woboats@gmail.com>"]
 name = "configure"
+authors = ["Without Boats <woboats@gmail.com>"]
+description = "Configuration management"
+license = "MIT OR Apache-2.0"
 version = "0.0.1"
 
 [dependencies]

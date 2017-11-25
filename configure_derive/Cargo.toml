@@ -2,6 +2,8 @@
 authors = ["Without Boats <woboats@gmail.com>"]
 name = "configure_derive"
 version = "0.1.0"
+license = "MIT OR Apache-2.0"
+description = "Derives for the configure crate."
 
 [dependencies]
 heck = "0.3.0"
