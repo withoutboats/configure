@@ -12,8 +12,10 @@ use configure::Configure;
 
 #[derive(Configure, Deserialize)]
 #[configure(name = "example")]
+#[configure(generate_docs)]
 #[serde(default)]
 pub struct Config {
+    #[configure(docs = "This is a socket address.")]
     socket_addr: SocketAddr,
     tls_cert: Option<PathBuf>,
 }
