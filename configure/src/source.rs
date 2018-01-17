@@ -101,7 +101,7 @@ impl ActiveConfiguration {
 
     /// Returns true if the configuration source is the default source.
     ///
-    /// The opposite of `CONFIGURATION.is_default()`
+    /// The opposite of `CONFIGURATION.is_overriden()`
     pub fn is_default(&'static self) -> bool {
         !self.is_overriden()
     }
