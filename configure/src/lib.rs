@@ -10,6 +10,9 @@ extern crate erased_serde;
 extern crate heck;
 extern crate toml;
 
+#[allow(unused_imports)]
+#[macro_use] extern crate configure_derive;
+
 #[cfg(test)]
 #[macro_use] extern crate serde_derive;
 
@@ -17,6 +20,9 @@ pub mod source;
 mod default;
 
 pub use erased_serde::Error as DeserializeError;
+
+#[doc(hidden)]
+pub use configure_derive::*;
 
 /// A configuration struct which can be generated from the environment.
 ///

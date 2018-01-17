@@ -11,6 +11,10 @@ heck = "0.3.0"
 serde = "1.0.21"
 toml = "0.4.5"
 
+[dependencies.configure_derive]
+path = "../configure_derive"
+version = "0.1.0"
+
 [dev-dependencies]
 serde_derive = "1.0.21"
 
