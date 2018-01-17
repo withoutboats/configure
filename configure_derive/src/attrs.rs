@@ -39,9 +39,10 @@ pub struct FieldAttrs {
 
 impl FieldAttrs {
     pub fn new(field: &Field) -> FieldAttrs {
-        let cfg_attrs = filter_attrs(&field.attrs);
 
         let mut cfg = FieldAttrs { docs: None };
+
+        let cfg_attrs = filter_attrs(&field.attrs);
 
         for attr in cfg_attrs {
             if let NestedMetaItem::MetaItem(ref attr) = *attr {
@@ -51,13 +52,17 @@ impl FieldAttrs {
                         panic!("Multiple `docs` attributes on one field: `{}`.", name)
                     }
                     "docs"                          => {
-                        cfg.docs = field_docs(attr)
+                        cfg.docs = Some(field_docs(attr))
                     }
                     unknown                         => {
                         panic!("Unrecognized configure attribute `{}`", unknown)
                     }
                 }
             } else { panic!("Unrecognized configure attribute literal") }
+        }
+
+        if cfg.docs.is_none() {
+            cfg.docs = desugared_docs(&field.attrs);
         }
 
         cfg
@@ -95,11 +100,22 @@ fn gen_docs(attr: &MetaItem) -> bool {
     }
 }
 
-fn field_docs(attr: &MetaItem) -> Option<String> {
+fn field_docs(attr: &MetaItem) -> String {
     if let MetaItem::NameValue(_, ref name) = *attr {
         if let Lit::Str(ref string, _) = *name {
-            return Some(string.clone())
+            return string.clone()
         }
     }
     panic!("Unsupported `configure(docs)` attribute; only supported form is #[configure(docs = \"$NAME\")]")
+}
+
+fn desugared_docs(attrs: &[Attribute]) -> Option<String> {
+    if let Some(attr) = attrs.iter().find(|attr| attr.is_sugared_doc) {
+        if let MetaItem::NameValue(_, ref name) = attr.value {
+            if let Lit::Str(ref string, _) = *name {
+                return Some(string.trim_left_matches('/').to_owned())
+            }
+        }
+    }
+    None
 }

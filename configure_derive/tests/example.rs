@@ -17,6 +17,7 @@ use configure::Configure;
 pub struct Config {
     #[configure(docs = "This is a socket address.")]
     socket_addr: SocketAddr,
+    /// This is the cert path.
     tls_cert: Option<PathBuf>,
 }
 
