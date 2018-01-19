@@ -50,7 +50,7 @@
 //! With this code, you can call `Config::generate` to pull you configuration
 //! from the environment, falling back to these default values if the end user
 //! has not set custom configuration for it.
-#![deny(missing_docs)]
+//#![deny(missing_docs)]
 #[macro_use] extern crate serde;
 extern crate erased_serde;
 extern crate heck;
@@ -63,6 +63,7 @@ extern crate toml;
 #[macro_use] extern crate serde_derive;
 
 pub mod source;
+mod null_deserializer;
 mod default;
 
 pub use erased_serde::Error as DeserializeError;
@@ -94,5 +95,19 @@ pub trait Configure: Sized {
     fn regenerate(&mut self) -> Result<(), DeserializeError> {
         *self = Self::generate()?;
         Ok(())
+    }
+}
+
+#[macro_export]
+macro_rules! config_source {
+    ($source:ty)  => {
+        $crate::source::CONFIGURATION.set(<$source as $crate::source::ConfigSource>::init())
+    }
+}
+
+#[macro_export]
+macro_rules! default_config_source {
+    ()  => {
+        config_source!($crate::source::DefaultSource)
     }
 }

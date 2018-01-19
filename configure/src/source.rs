@@ -14,11 +14,10 @@
 use std::sync::{Once, ONCE_INIT};
 use std::sync::atomic::{AtomicBool, Ordering, ATOMIC_BOOL_INIT};
 
-use serde::Deserializer;
 use erased_serde::Deserializer as DynamicDeserializer;
 
 pub use default::DefaultSource;
-
+use null_deserializer::NullDeserializer;
 
 /// The global static holding the active configuration source for this project.
 pub static CONFIGURATION: ActiveConfiguration = ActiveConfiguration {
@@ -27,6 +26,11 @@ pub static CONFIGURATION: ActiveConfiguration = ActiveConfiguration {
 };
 
 static mut SOURCE: Option<&'static (Fn(&'static str) -> Box<DynamicDeserializer> + Send + Sync + 'static)> = None;
+
+pub trait ConfigSource: Send + Sync + 'static {
+    fn init() -> Self;
+    fn prepare(&self, package: &'static str) -> Box<DynamicDeserializer<'static>>;
+}
 
 /// The active configuration source.
 ///
@@ -50,37 +54,10 @@ impl ActiveConfiguration {
     /// If you set the active configuration, you should do so very early in
     /// your program, preferably as close to the beginning of main as possible.
     /// That way, the configuration source is consistent for every dependency.
-    ///
-    /// For example, if you wanted to store each dependency's config in a JSON
-    /// separate file per dependency:
-    ///
-    /// ```rust,ignore
-    /// use std::fs::File;
-    /// use std::env;
-    /// use std::path::PathBuf;
-    ///
-    /// use configure::source::CONFIGURATION;
-    /// use serde_json::Deserializer;
-    ///
-    /// fn main() {
-    ///     let dir: PathBuf = env::var_os("CARGO_MANIFEST_DIR").unwrap().into();
-    ///     CONFIGURATION.set(move |package| {
-    ///         let file = File::open(dir.join(format!("{}.json", package)));
-    ///         Deserializer::new(file)
-    ///     }
-    /// }
-    /// ```
-    pub fn set<F, D>(&'static self, initializer: F)
-    where
-        F: Fn(&'static str) -> D + Send + Sync + 'static,
-        D: for<'de> Deserializer<'de> + 'static,
-    {
+    pub fn set<T: ConfigSource>(&'static self, source: T) {
         self.init.call_once(||  {
             self.is_overriden.store(true, Ordering::Relaxed);
-            let init = Box::new(move |s| {
-                let deserializer = initializer(s);
-                Box::new(DynamicDeserializer::erase(deserializer)) as Box<DynamicDeserializer>
-            });
+            let init = Box::new(move |s| source.prepare(s));
             unsafe { SOURCE = Some(&*Box::into_raw(init)) }
         });
     }
@@ -92,9 +69,10 @@ impl ActiveConfiguration {
     /// Configure for their config struct, which will call this method.
     pub fn get(&'static self, package: &'static str) -> Box<DynamicDeserializer> {
         self.init.call_once(|| {
-            let source = DefaultSource::init();
-            let init = Box::new(move |s| source.prepare(s));
-            unsafe { SOURCE = Some(&*Box::into_raw(init)) }
+            fn null_deserializer(_package: &'static str) -> Box<DynamicDeserializer> {
+                Box::new(DynamicDeserializer::erase(NullDeserializer))
+            }
+            unsafe { SOURCE = Some(&null_deserializer) }
         });
         unsafe { SOURCE.unwrap()(package) }
     }

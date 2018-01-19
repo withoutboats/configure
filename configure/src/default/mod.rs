@@ -13,6 +13,7 @@ use erased_serde::{Error, Deserializer as DynamicDeserializer};
 use heck::ShoutySnakeCase;
 use toml;
 
+use source::ConfigSource;
 use self::env_deserializer::EnvDeserializer;
 
 /// The default source for configuration values. If you do not set the source
@@ -27,13 +28,23 @@ pub struct DefaultSource {
     toml: Option<Arc<toml::Value>>,
 }
 
-impl DefaultSource {
-    pub(crate) fn init() -> DefaultSource {
+impl ConfigSource for DefaultSource {
+    fn init() -> DefaultSource {
         DefaultSource {
             toml: DefaultSource::toml().map(Arc::new),
         }
     }
 
+    fn prepare(&self, package: &'static str) -> Box<DynamicDeserializer<'static>> {
+        let deserializer = DefaultDeserializer {
+            source: self.clone(),
+            package: package,
+        };
+        Box::new(DynamicDeserializer::erase(deserializer)) as Box<DynamicDeserializer>
+    }
+}
+
+impl DefaultSource {
     #[cfg(test)]
     pub fn test(toml: Option<toml::Value>) -> DefaultSource {
         DefaultSource {
@@ -64,16 +75,6 @@ impl DefaultSource {
         manifest.get("package")
                 .and_then(|package| package.get("metadata"))
                 .map(|metadata| metadata.clone())
-    }
-
-    /// Prepare a deserializer to be used for the configuration for this given
-    /// package.
-    pub fn prepare(&self, package: &'static str) -> Box<DynamicDeserializer<'static>> {
-        let deserializer = DefaultDeserializer {
-            source: self.clone(),
-            package: package,
-        };
-        Box::new(DynamicDeserializer::erase(deserializer)) as Box<DynamicDeserializer>
     }
 }
 

@@ -1,4 +1,4 @@
-extern crate configure;
+#[macro_use] extern crate configure;
 extern crate test_setup;
 
 use std::env;
@@ -12,6 +12,7 @@ fn env_vars_set() {
     env::set_var("TEST_FIRST_FIELD", "7");
     env::set_var("TEST_SECOND_FIELD", "BazQuux");
     env::set_var("TEST_THIRD_FIELD", "0,1");
+    default_config_source!();
 
     assert_eq!(Configuration::generate().unwrap(), Configuration {
         first_field: 7,

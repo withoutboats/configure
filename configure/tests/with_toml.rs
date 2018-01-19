@@ -1,4 +1,4 @@
-extern crate configure;
+#[macro_use] extern crate configure;
 extern crate test_setup;
 
 use std::env;
@@ -11,6 +11,7 @@ use test_setup::Configuration;
 fn from_toml_values() {
     let dir: PathBuf = env::var_os("CARGO_MANIFEST_DIR").unwrap().into();
     env::set_var("CARGO_MANIFEST_DIR", dir.join("test-setup"));
+    default_config_source!();
 
     assert_eq!(Configuration::generate().unwrap(), Configuration {
         first_field: 9,
