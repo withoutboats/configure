@@ -85,8 +85,9 @@ configuration can override that source.
 ### The default source
 
 By default, `configure` provides a source of configuration that users can rely
-on. The default source is targeted at network services, and may not be
-appropriate to all other domains.
+on. Users can use this source using the `use_default_config!` macro at the
+beginning of their main function. The default source is targeted at network
+services, and may not be appropriate to all other domains.
 
 It works like this:
 
@@ -106,23 +107,10 @@ them be consistent across every developer's machine.
 
 ### Custom configuration source
 
-Users can override the default configuration for their app using
-`CONFIGURATION.set`. This method can only be called once, or it will take no
-effect. It is only intended to be called by application authors; calling it
-from a library is always incorrect. For example, if you'd prefer to gather your
-configuration from a yaml manifest, you can do something like this at the
-beginning of your main function (this code is just a sketch, not based on the
-actual API of any yaml parsing library):
-
-```rust
-fn main() {
-    let config: HashMap<String, yaml::Value> = yaml::from_file("config.yml").unwrap();
-
-    CONFIGURATION.set(move |package| {
-	Box::new(config[package].to_owned())
-    });
-}
-```
+Users can override the default configuration for their app using the
+`use_config_from!` macro. This macro should only be invoked once, in the final
+binary. First, you will need to prepare a type that implements `ConfigSource`
+to be used as the source of configuration.
 
 This allows users to control their configuration source without recompiling all
 of the library code that depends on it, as would occur if the configuration

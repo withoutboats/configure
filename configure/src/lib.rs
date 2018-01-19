@@ -50,7 +50,7 @@
 //! With this code, you can call `Config::generate` to pull you configuration
 //! from the environment, falling back to these default values if the end user
 //! has not set custom configuration for it.
-//#![deny(missing_docs)]
+#![deny(missing_docs)]
 #[macro_use] extern crate serde;
 extern crate erased_serde;
 extern crate heck;
@@ -98,16 +98,17 @@ pub trait Configure: Sized {
     }
 }
 
+/// 
 #[macro_export]
-macro_rules! config_source {
+macro_rules! use_config_from {
     ($source:ty)  => {
         $crate::source::CONFIGURATION.set(<$source as $crate::source::ConfigSource>::init())
     }
 }
 
 #[macro_export]
-macro_rules! default_config_source {
+macro_rules! use_default_config {
     ()  => {
-        config_source!($crate::source::DefaultSource)
+        use_config_from!($crate::source::DefaultSource)
     }
 }

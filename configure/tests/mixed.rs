@@ -12,7 +12,7 @@ fn mixed() {
     let dir: PathBuf = env::var_os("CARGO_MANIFEST_DIR").unwrap().into();
     env::set_var("CARGO_MANIFEST_DIR", dir.join("test-setup").join("alt-toml"));
     env::set_var("TEST_FIRST_FIELD", "12");
-    default_config_source!();
+    use_default_config!();
 
     assert_eq!(Configuration::generate().unwrap(), Configuration {
         first_field: 12,

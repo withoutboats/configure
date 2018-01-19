@@ -27,14 +27,26 @@ pub static CONFIGURATION: ActiveConfiguration = ActiveConfiguration {
 
 static mut SOURCE: Option<&'static (Fn(&'static str) -> Box<DynamicDeserializer> + Send + Sync + 'static)> = None;
 
+/// A source for configuration.
+/// 
+/// If an end user wishes to pull configuration from the environment, they must
+/// specify their source, which is a type that implements ConfigSource. The
+/// source can be specified using the `use_config_from!` macro.
+///
+/// This crate ships a default source, called DefaultSource, which implements
+/// this trait.
 pub trait ConfigSource: Send + Sync + 'static {
+    /// Initialize this source. This will be called once when the program
+    /// begins and then never called again.
     fn init() -> Self;
+    /// Prepare a deserializer for a particular package. This will be called
+    /// every time we generate configuration for that package.
     fn prepare(&self, package: &'static str) -> Box<DynamicDeserializer<'static>>;
 }
 
 /// The active configuration source.
 ///
-/// The onyl value of this type is the CONFIGURATION global static, which
+/// The only value of this type is the CONFIGURATION global static, which
 /// controls what the source of configuration values is. End users can set
 /// the configuration source using the `set` method, while libraries which
 /// need to be configured can use the `get` method.
