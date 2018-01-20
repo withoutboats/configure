@@ -1,6 +1,6 @@
-extern crate configure;
 extern crate serde;
 
+#[macro_use] extern crate configure;
 #[macro_use] extern crate configure_derive;
 #[macro_use] extern crate serde_derive;
 
@@ -34,6 +34,7 @@ impl Default for Config {
 fn check_that_it_works() {
     env::remove_var("CARGO_MANIFEST_DIR");
     env::set_var("EXAMPLE_TLS_CERT", "etc/certificate");
+    use_default_config!();
 
     let cfg = Config::generate().unwrap();
 
