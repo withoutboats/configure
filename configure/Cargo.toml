@@ -3,6 +3,7 @@ name = "configure"
 authors = ["Without Boats <woboats@gmail.com>"]
 description = "Configuration management"
 documentation = "https://docs.rs/configure"
+repository = "https://github.com/withoutboats/configure"
 license = "MIT OR Apache-2.0"
 version = "0.1.1"
 
