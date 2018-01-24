@@ -33,7 +33,7 @@ fn impl_configure(ast: DeriveInput) -> Tokens {
 
     quote!{
         impl #generics ::configure::Configure for #ty #generics {
-            fn generate() -> Result<Self, ::configure::DeserializeError> {
+            fn generate() -> ::std::result::Result<Self, ::configure::DeserializeError> {
                 let deserializer = ::configure::source::CONFIGURATION.get(#project);
                 ::serde::Deserialize::deserialize(deserializer)
             }
